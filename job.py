@@ -14,6 +14,18 @@ from awsglue.dynamicframe import DynamicFrame
 class LandingToRawJob:
     """
     Glue Job to move data from Landing zone to raw layer
+
+    Args:
+        job_name (str): AWS Glue job name
+        source_path (str): S3 source path to read data from
+        source_format (str): Source file format
+        target_path (str): S3 target path to write data to
+        target_format (str): Target file format
+        target_database (str): Target database name
+        target_table (str): Target table name
+        partition (str): Partition column name
+        write_mode (Optional[str]): Destination write mode. Defaults to `append`
+        log_level (Optional[int]): Logging level. Defaults to `INFO`
     """
     job_name: str
     source_path: str
@@ -34,9 +46,12 @@ class LandingToRawJob:
         self._glue_context = GlueContext(SparkContext.getOrCreate())
         self._job = Job(self._glue_context)
 
-    def setup_logger(self):
+    def setup_logger(self) -> logging.Logger:
         """
         Configure a logger to be used
+
+        Returns:
+            logging.Logger: A configured logger
         """
         logging.basicConfig(
             format='%(asctime)s %(levelname)s %(name)s: %(message)s',
@@ -50,6 +65,9 @@ class LandingToRawJob:
     def read_from_s3_source(self) -> DynamicFrame:
         """
         Reads data from source with dynamic frame using Glue Catalog
+
+        Returns:
+            DynamicFrame: Glue dynamic frame retrieved from source path
         """
         self._logger.info(f"Reading data from {self.source_path} ...")
 
@@ -65,20 +83,24 @@ class LandingToRawJob:
         Writes a dynamic frame to a destination, like s3
 
         Args:
-
+            frame (DynamicFrame): Dynamic Frame to be written
         """
+        self._logger.info("Writing DataFrame to destination ...")
+
         table_reference = f"{self.target_database}.{self.target_table}"
 
         dataframe = frame.toDF()
         dataframe.write \
             .format(self.target_format) \
-            .options(path=self.target_) \
+            .options(path=self.target_path) \
             .mode(self.write_mode) \
             .partitionBy(self.partition) \
             .saveAsTable(table_reference)
 
     def execute(self) -> None:
-        """Executes the entire job"""
+        """
+        Executes the extract ,transform and load steps
+        """
         self._logger.info(f"Initialing job {self.job_name} ...")
         self._job.init(self.job_name)
 
@@ -89,26 +111,13 @@ class LandingToRawJob:
         self._logger.info("Job completed successfully!")
 
 
-
-def main(args) -> None:
+def parse_args() -> dict:
     """
-    Executes the extract,transform and load steps
+    Parses known arguments. Lowercase the `JOBNAME` parameter also
+
+    Returns:
+        dict: Dictionary with required arguments
     """
-    job = LandingToRawJob(
-        job_name=args["JOB_NAME"],
-        source_path=args["source_path"],
-        source_format=args["source_format"],
-        target_path=args["target_path"],
-        target_format=args["target_format"],
-        target_database=args["target_database"],
-        target_table=args["target_table"],
-        partition=args["partition"],
-    )
-    
-    job.execute()
-
-
-if __name__ == "__main__":
     required_args = [
         "JOB_NAME",
         "source_path",
@@ -120,6 +129,18 @@ if __name__ == "__main__":
         "partition",
     ]
 
-    args = getResolvedOptions(sys.argv, required_args)
+    args =  getResolvedOptions(sys.argv, required_args)
+    args["job_name"] = args.pop["JOB_NAME"]
+
+    return args
+
+def main(args) -> None:
+    """Executes the entire job"""
+    job = LandingToRawJob(**args)
+    job.execute()
+
+
+if __name__ == "__main__":
+    args = parse_args()
 
     main(args)
