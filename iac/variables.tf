@@ -32,6 +32,12 @@ variable "command" {
   description = "The command of the job."
 }
 
+variable "default_arguments" {
+  type        = map(string)
+  description = " (Optional) The map of default arguments for this job. You can specify arguments here that your own job-execution script consumes, as well as arguments that AWS Glue itself consumes."
+  default     = null
+}
+
 variable "tags" {
   type        = map(string)
   description = "Key-value mapping of resource tags"
