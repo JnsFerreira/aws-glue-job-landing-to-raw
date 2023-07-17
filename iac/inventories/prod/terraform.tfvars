@@ -5,8 +5,15 @@ description  = "Glue job to move table A data from landing zone to raw"
 glue_version = "4.0"
 
 default_arguments = {
-  "--spark-conf" = "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension"
-  "--spark-conf" = "spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog"
+  "--spark-conf"      = "spark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension"
+  "--spark-conf"      = "spark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog"
+  "--source_path"     = "s3://claropay-prod-landing-zone/domain/table"
+  "--source_format"   = "json"
+  "--target_path"     = "s3://claropay-prod-raw-layer/domain/table"
+  "--target_format"   = "delta"
+  "--target_database" = "claropay-prod-raw"
+  "--target_table"    = "table_a"
+  "--partition"       = "date"
 }
 command = {
   name            = "glueetl"
