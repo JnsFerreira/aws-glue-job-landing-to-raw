@@ -5,11 +5,11 @@ locals {
 module "glue_job" {
   source = "git::https://github.com/JnsFerreira/terraform-module-aws-glue-job?ref=v1.0.0"
 
-  name         = var.name
-  description  = var.description
-  iam_policy   = local.iam_policy
-  glue_version = var.glue_version
-  command      = var.command
+  name              = var.name
+  description       = var.description
+  iam_policy        = local.iam_policy
+  glue_version      = var.glue_version
+  command           = var.command
   default_arguments = var.default_arguments
-  tags         = var.tags
+  tags              = var.tags
 }
