@@ -26,8 +26,20 @@
             ],
             "Resource": [
                 "arn:aws:glue:us-west-2:123456789012:catalog",
-                "arn:aws:glue:us-west-2:123456789012:database/my-hom-db",
-                "arn:aws:glue:us-west-2:123456789012:table/my-hom-db/my-hom-table" 
+                "arn:aws:glue:us-west-2:123456789012:database/my-uat-db",
+                "arn:aws:glue:us-west-2:123456789012:table/my-uat-db/my-uat-table" 
+            ]
+        },
+        {
+            "Sid": "AllowS3ReadLanding",
+            "Effect": "Allow",
+            "Action": [
+                "s3:List*",
+                "s3:Get*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::claropay-uat-landing-zone",
+                "arn:aws:s3:::claropay-dev-landing-zone/*"
             ]
         }
     ]
