@@ -29,6 +29,18 @@
                 "arn:aws:glue:us-west-2:123456789012:database/my-prod-db",
                 "arn:aws:glue:us-west-2:123456789012:table/my-prod-db/my-prod-table" 
             ]
+        },
+        {
+            "Sid": "AllowS3ReadLanding",
+            "Effect": "Allow",
+            "Action": [
+                "s3:List*",
+                "s3:Get*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::claropay-prod-landing-zone",
+                "arn:aws:s3:::claropay-prod-landing-zone/*"
+            ]
         }
     ]
 }
